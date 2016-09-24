@@ -11,22 +11,21 @@ describe('Retry', () => {
       expect(Retry.retry({}, (callback) => callback(null, 1))).to.be.instanceOf(Promise)
     })
 
-    it('should retry operation', (done) => {
+    it('should retry operation', () => {
       let attempt = 0
 
-      Retry.retry({ retries: 5 }, (callback) => {
+      return Retry.retry({ retries: 5 }, (callback) => {
         attempt++
         callback(new Error())
       }).catch(() => {
         expect(attempt).to.be.equal(5)
-        done()
       })
     })
 
-    it('should return result', (done) => {
+    it('should return result', () => {
       let attempt = 0
 
-      Retry.retry({ retries: 5 }, (callback) => {
+      return Retry.retry({ retries: 5 }, (callback) => {
         attempt++
 
         if (attempt === 4) {
@@ -36,29 +35,26 @@ describe('Retry', () => {
         callback(new Error())
       }).then((result) => {
         expect(result).to.be.equal(attempt)
-        done()
       })
     })
 
-    it('should wait X time between attempts', (done) => {
+    it('should wait X time between attempts', () => {
       const startedAt = Date.now()
 
-      Retry.retry({ retries: 5, timeout: 20 }, (callback) => {
+      return Retry.retry({ retries: 5, timeout: 20 }, (callback) => {
         callback(new Error())
       }).catch(() => {
         expect(Date.now() - 80).to.be.above(startedAt)
-        done()
       })
     })
 
-    it('should wait X (generated) time between attempts', (done) => {
+    it('should wait X (generated) time between attempts', () => {
       const startedAt = Date.now()
 
-      Retry.retry({ retries: 5, timeout: (attempt) => attempt * 10 }, (callback) => {
+      return Retry.retry({ retries: 5, timeout: (attempt) => attempt * 10 }, (callback) => {
         callback(new Error())
       }).catch(() => {
         expect(Date.now() - 100).to.be.above(startedAt)
-        done()
       })
     })
 
